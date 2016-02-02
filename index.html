@@ -1,0 +1,579 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Popcorn Time</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=0">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="/css/app.css?cb=04">
+        <script src="js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/iscroll.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/mousetrap.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/mousetrap-pause.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/api.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/locale.js?cb=04" type="text/javascript" charset="utf-8"></script>
+        <script src="js/app.js?cb=09" type="text/javascript" charset="utf-8"></script>
+        <script src="js/app.config.js?cb=04" type="text/javascript" charset="utf-8"></script>
+        <script src="js/app.keyboardNav.js?cb=01" type="text/javascript" charset="utf-8"></script>
+        <script src="js/app.favs.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/app.history.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.js?cb=01" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.movies.js?cb=02" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.tv_show.js?cb=00" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.vpn_page.js?cb=13" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.settings_page.js?cb=05" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.loading_wrapper.js?cb=02" type="text/javascript" charset="utf-8"></script>
+        <script src="js/fetcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/utils.js?cb=1" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/movies/t4p_movies.js?cb=01" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/movies/yts.js?cb=01" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/movies/anime.js?cb=02" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/tv/t4p_tv.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/tv/anime.js?cb=01" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/subtitles/ysubs.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/scrappers/subtitles/torrentsapi.js?cb=00" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ui.torrentstime.js?cb=24" type="text/javascript" charset="utf-8"></script>
+        <script src="js/torrentstime.js?cb=00"></script>
+        <script>
+
+			$(document).ready(function() {
+				ui.torrentsTime.checkPluginSupportFF();
+			});
+			torrentsTime.functions.installing= function() {
+				ui.torrentsTime.installHandler();
+			};
+			torrentsTime.functions.downloadStarted = function() {
+				ui.torrentsTime.downloadHandler();
+			};
+			torrentsTime.functions.installComplete = function() {
+				ui.torrentsTime.isInstallingHide = true;
+				ui.loading_wrapper.change_stats(100,0,0,0, 'Installing... Please wait.');
+				ui.torrentsTime.hideInstallingWrapper();
+			};
+
+			torrentsTime.functions.preload_ongoing = function(params){
+				if(!$('#loading_wrapper').hasClass('activated'))
+					ui.loading_wrapper.show();
+				ui.loading_wrapper.change_stats(params.percent, params.speed, params.seeders, params.peers, (params.seeders ? 'Downloading' : 'Looking for peers...'))
+			}
+			torrentsTime.functions.preload_started = function(){
+					ui.loading_wrapper.show();
+				ui.loading_wrapper.change_stats(1, 0, 0, 0, ('Looking for peers...'))
+				
+			}
+
+			torrentsTime.functions.preload_complete = function(){
+				ui.torrentsTime.show();
+			}
+
+			torrentsTime.functions.vpn_status = function(params){
+				if(params.state){
+					app.config.hostApp.isVpnInstalled = true;
+
+					if(params.state < 3)
+						app.vpn.disconnected();
+					else
+						app.vpn.connected();
+				}
+			}
+
+			torrentsTime.functions.vpnPrompt = function(pageUrl){
+				vpnPageUrl = pageUrl
+				ui.vpn_page.alert.show();
+			}
+
+
+			torrentsTime.functions.initEnded = function(){
+				if(torrentsTime.setup.isInstalled && torrentsTime.setup.browser=='chrome')
+				torrentsTime.utils.addListener(torrentsTime.pt.plugin.object, "progress", function(event){
+					if (event.lengthComputable && event.total > 0) {
+						var loadPercent = Math.floor(event.loaded / event.total * 100);
+						if(loadPercent >= 100) {
+						}
+//							ui.loading_wrapper.hide(1);
+						else{
+							if(!$('#loading_wrapper').hasClass('activated'))
+								ui.loading_wrapper.show(1);
+
+							ui.loading_wrapper.change_stats(loadPercent,0,0,0, "Preparing for first run. Please wait...");
+						}
+					}
+				})
+			}
+			torrentsTime.functions.initialized = function() {
+				if(hostApp.downloadInitialized) {
+					torrentsTime.setup.autoPlay=false;
+					hostApp.downloadInitialized = false;
+				}
+			};
+
+			torrentsTime.functions.deviceIsNotSupported = function(){
+				$(function(){ $('#deviceNotSupported').show(); setTimeout("location.href='http://'",15000)})
+			}
+
+
+
+			torrentsTime.init({
+				publisher_id: 7,
+				isHidden: true,
+				id:"pt",
+				vpnAlert: app.config.hostApp.vpnAlert!='off',
+				style:{backgroundColor:"#000000"}
+			});
+
+        </script>
+    </head>
+    <body>
+
+		<div id="header">
+
+			<div id="toolbar" class="nav sections">
+				<div class="btn movies activated" data-section="movies">
+					<div class="icon2 film"></div>
+					<span data-in-trans="movies">Movies</span>
+				</div>
+				<div class="btn tv" data-section="tv">
+					<div class="icon2 tv"></div>
+					<span data-in-trans="tv_shows">TV shows</span>
+				</div>
+			</div>
+
+			<div id="logo"></div>
+
+			<div id="menu_panel">
+				<div class="icon info" onclick="ui.about_page.show();"></div>
+				<div class="icon2 settings" onclick="ui.settings_page.show()"></div>
+				<div class="icon unlocked vpn" onclick="ui.vpn_page.show()"></div>
+				<div class="icon heart favs" onclick="app.favs.show()"></div>
+
+				<div id="search_cont">
+					<div class="icon search"></div>
+					<div id="autocomplete"></div>
+					<input type="text" id="search_input" tabindex="-1" placeholder="Search...">
+				</div>
+
+			</div>
+		</div>
+
+		<div class="container" id="catalog">
+
+				<div id="movies_catalog">
+					<div id="catalog_scroller"></div>
+				</div>
+
+		</div>
+
+		<div id="menu_teaser">
+			<div></div>
+			<div></div>
+		</div>
+
+		<div id="history_panel">
+			<div class="incont">
+				<div id="history_cont">
+					<div class="incont">
+						<div class="scroller"></div>
+					</div>
+				</div>
+
+				<div class="caption" data-in-trans="history">History</div>
+
+			</div>
+		</div>
+
+
+		<div id="bottom_panel">
+			<input tabindex="-1" type="range" value="10" min="0" max="125" onchange="ui.home.catalog.set_sizes(this.value);this.blur();" id="size_setter">
+		</div>
+
+		<div id="side_menu">
+			<div class="incont">
+				<div id="sidetools">
+					<div id="genres_box">
+
+					</div>
+					<div id="sortby_box">
+						<div style="font-size:11px;color:#fff"><b>Sort By:</b>&nbsp;
+							<select tabindex="-1" id="select_sortby" onchange="app.config.fetcher.sortBy=this.value;ui.home.catalog.show()">
+								<option value="seeds">Popularity</option>
+								<option value="dateadded">Date added</option>
+								<option value="year">Year</option>
+								<option value="title">Title</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div id="mode_box">
+					<span class="activated" data-mode="imdb">IMDb</span> &nbsp;&#183;&nbsp; <span data-mode="anime">Anime</span> &nbsp;&#183;&nbsp; <span data-mode="cartoons">Cartoons</span>
+				</div>
+
+			</div>
+		</div>
+
+		<div id="loading_wrapper">
+			<div class="incont">
+				<div class="close" onclick="ui.loading_wrapper.hide()"></div>
+
+				<div class="displays">
+					<div class="percents">0%</div>
+				</div>
+				<div class="bars_cont"></div>
+
+					<div class="peers f"><span class="val"></span> &nbsp; <span style="font-family:opensansbold">Peers</span></div>
+					<div class="speed f"><span style="font-family:opensansbold">Speed</span> &nbsp; <span class="val"></span></div>
+					<div class="msg"></div>
+			</div>
+		</div>
+
+
+		<div id="html_resource">
+
+				<div id="movie_cover_html">
+
+						[##poster_img##]
+
+						<div class="poster_slide">
+							<div class="poster_slide_cont">
+								<div class="poster_slide_bg"></div>
+								<div class="poster_slide_details">
+									<div class="title" style="font-size:[##titleFontSize##]px">
+										[##title##]
+										<div class="year" style="font-size:[##yearFontSize##]px"><span onclick="app.favs.toggle('[##id##]')" class="icon2 heart fav-btn [##infavs##]"></span> &nbsp; [##year##]</div>
+									</div>
+
+									<div class="details">
+										<div class="tools" style="display:none;font-size:[##toolsFontSize##]px"> <span class="icon2 heart fav-btn [##infavs##]"></span> &nbsp;<span class="icon2 download"></span></div>
+										<div class="stars" style="font-size:[##starsFontSize##]px">[##stars##]</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+				</div>
+
+
+				<!-- start of movie slider -->
+				<div id="movie_slider_html">
+					<div class="backdrop"></div>
+					<div class="bottom_toolbox"></div>
+
+					<div id="watch_toolbox">
+						<div class="toolbox_content">
+							<div class="sep">
+								<div class="watch-btn" onclick="ui.movies.watch()">
+									<div class="icon2 play"></div>
+									<div class="caption" data-in-trans="watchItNow">WATCH IT NOW</div>
+								</div>
+							</div>
+							<div class="sep">
+								<div class="quality_selector 1080p" data-quality="1080p">&nbsp;</div>
+								<div class="quality_selector 720p" data-quality="720p">&nbsp;</div>
+								<div class="quality_selector 3d" data-quality="3D">&nbsp;</div>
+
+								<div class="selector torrent_selector">
+									<div class="selector_cont" onmouseleave="$(this).children('.activated').insertBefore($(this).children('.item').first());this.scrollTop=0"></div>
+									<div class="icon2 down2"></div>
+								</div>
+
+
+							</div>
+
+							<div class="sep" style="color:rgba(255,255,255,0.7);">
+
+
+
+
+								<!--<div class="selector subs_selector">
+									<div class="selector_cont" onmouseleave="$(this).children('.activated').insertBefore($(this).children('.item').first());this.scrollTop=0"></div>
+									<div class="icon2 down2"></div>
+								</div>-->
+
+
+								<div class="tools">
+									<div class="tool icon2 heart [##infavs##] fav-btn"></div>
+									<div class="tool trailer" data-in-trans="trailer">Trailer</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="movie_cont">
+						<div class="incont">
+							<img class="poster_img">
+							<div class="content">
+								<div class="title">[##title##]</div>
+								<div class="title_info_cont">
+
+
+									<div class="title_info genre"></div>
+									<div class="title_info"><span class="icon2 date"></span> &nbsp;[##year##]</div>
+									<div class="title_info"><span class="icon2 time"></span> <span class="runtime"></span></div>
+									<div class="title_info stars">[##stars##]</div>
+
+
+								</div>
+								<div class="synopsis"></div>
+								<div class="actors"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- end of movie slider -->
+
+
+				<!--start of tv show slider -->
+				<div id="tvshow_slider_html">
+					<div class="backdrop"></div>
+
+					<div class="head">
+						<div class="incont">
+
+							<div class="poster"></div>
+
+							<div class="info_cont">
+								<div class="title">[##title##]</div>
+								<div class="title_info_cont">
+
+
+									<div class="title_info genre"></div>
+									<div class="title_info runtime_cont"><span class="icon2 time"></span> <span class="runtime"></span></div>
+									<div class="title_info"><span class="icon2 date"></span> &nbsp;<span class="year">[##year##]</span></div>
+									<div class="title_info">[##stars##]</div>
+
+
+								</div>
+								<div class="synopsis"></div>
+
+							</div>
+						</div>
+					</div>
+
+					<div class="body">
+						<div class="column seasons"></div>
+						<div class="column episodes"></div>
+						<div class="column content">
+							<div class="episode_name"></div>
+							<div class="episode_info"><b class="episode_number"></b></div>
+							<div class="episode_overview"></div>
+
+
+								<div id="watch_toolbox">
+									<div class="toolbox_content">
+										<div class="sep">
+											<div class="watch-btn" onclick="ui.tv.watch()">
+												<div class="icon2 play"></div>
+												<div class="caption" data-in-trans="watchItNow">WATCH IT NOW</div>
+											</div>
+										</div>
+										<div class="sep">
+
+											<!--<div class="selector subs_selector">
+												<div class="selector_cont" onmouseleave="$(this).children('.activated').insertBefore($(this).children('.item').first());this.scrollTop=0"></div>
+												<div class="icon2 down2"></div>
+											</div>-->
+
+
+											<div class="selector torrent_selector">
+												<div class="selector_cont" onmouseleave="$(this).children('.activated').insertBefore($(this).children('.item').first());this.scrollTop=0"></div>
+												<div class="icon2 down2"></div>
+											</div>
+
+
+										</div>
+										<!-- end seps -->
+									</div>
+
+								</div>
+								<!--toolbox end-->
+
+						</div>
+					</div>
+
+				</div>
+				<!-- end of tv show slider -->
+
+
+				<!--start vpn page -->
+				<div id="vpn_page_html">
+
+					<div class="cont">
+						<div class="vpn_icon"><div><span class="icon"></span></div></div>
+						<div class="vpn_button_holder"><div class="vpn_button"></div></div>
+					</div>
+
+				</div>
+				<!-- end vpn page -->
+
+
+				<div id="settings_page_html">
+
+					<table cellspacing="0" cellpadding="0" class="settings_table">
+						<tr>
+							<td class="title">
+								Settings
+							</td>
+							<td style="border-bottom:0">&nbsp;</td>
+						</tr>
+						<tr>
+							<td>
+								Interface
+							</td>
+							<td>
+								<div class="fieldset">
+									Default language:
+									<select class="langs">[##languages##]</select>
+								</div>
+
+								<div class="fieldset">
+									Theme:
+									<select><option>Classic</option></select>
+								</div>
+
+
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Downloads
+							</td>
+							<td style="border-bottom:0">
+
+								<div class="fieldset">
+
+							<label class="vpn">
+								<input type="checkbox" style="vertical-align:middle" class="cf_checkbox vpnalert" onchange="app.config.set({hostApp:{vpnAlert:(this.checked ? 'on':'off')}})">
+								ALert me before downloading if my VPN is turned off
+							 </label>
+
+
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<!-- settings page end -->
+
+				<div id="about_page_html">
+
+						<div class="cover" style="background:url(css/images/about.png) no-repeat center center;background-size:cover;width:100%;height:100%;position:absolute;top:0;left:0;"></div>
+						<div class="legend">
+							<span style="font-family:opensansbold">Popcorn Time</span><br>
+							<b>Version:</b> [##version##]
+						</div>
+
+
+						<div class="shortcuts_cont">
+							<table>
+								<tr>
+									<td><span class="key">&#8592;</span> <span class="key">&#8593;</span> <span class="key">&#8594;</span> <span class="key">&#8595;</span></td>
+									<td>Navigate</td>
+								</tr>
+								<tr>
+									<td><span class="key">ENTER</span><span class="sep">/</span><span class="key">&nbsp; &nbsp; &nbsp; SPACE &nbsp; &nbsp; &nbsp;</span></td>
+									<td>Choose / Play</td>
+								</tr>
+								<tr>
+									<td><span class="key">CTRL</span><span class="sep">+</span><span class="key">+</span></td>
+									<td>Enlarge Covers</td>
+								</tr>
+								<tr>
+									<td><span class="key">CTRL</span><span class="sep">+</span><span class="key" style="padding:3px 9px">-</span></td>
+									<td>Reduce Covers</td>
+								</tr>
+								<tr>
+									<td><span class="key">CTRL</span><span class="sep">+</span><span class="key">F</span></td>
+									<td>Search</td>
+								</tr>
+								<tr>
+									<td><span class="key">&nbsp;TAB&nbsp;</span></td>
+									<td>Toggle Movies / TV shows</td>
+								</tr>
+								<tr>
+									<td><span class="key">SHIFT</span></td>
+									<td>Open / Close Side menu</td>
+								</tr>
+								<tr>
+									<td><span class="key">Esc</span></td>
+									<td>Close</td>
+								</tr>
+								<tr>
+									<td><span class="key">Q</span></td>
+									<td>Toggle Quality</td>
+								</tr>
+								<tr>
+									<td><span class="key">V</span></td>
+									<td>Mark as watched</td>
+								</tr>
+								<tr>
+									<td><span class="key">T</span></td>
+									<td>Watch trailer</td>
+								</tr>
+								<tr>
+									<td><span class="key">INSERT</span><span class="sep">/</span><span class="key">F</span></td>
+									<td>Add to bookmarks</td>
+								</tr>
+								<tr>
+									<td><span class="key">B</span></td>
+									<td>Go to bookmarks</td>
+								</tr>
+								<tr>
+									<td><span class="key">F5</span></td>
+									<td>Reload Interface</td>
+								</tr>
+							</table>
+						</div>
+
+
+						<div class="social">
+							<span class="icon2 facebook" onclick="hostApp.openBrowser('https://')"></span>
+							<span class="icon2 twitter" onclick="hostApp.openBrowser('https://')"></span>
+							<span class="icon2 forum" onclick="hostApp.openBrowser('http://')"></span>
+							<span class="icon2 wordpress" onclick="hostApp.openBrowser('http://')"></span>
+						</div>
+
+				</div>
+
+		</div>
+		<div id="msg"><div></div></div>
+		<div id="vpn_alert">
+			<div class="alertbox">
+				<img src="css/images/alert.png">
+				<div class="title" data-in-trans="VpnDisabled">VPN DISABLED!</div>
+				<div class="text" data-in-trans="VpnAlert">IT IS HIGHLY RECOMMENDED TO USE VPN <br>TO AVOID UNNECESSARY RISKS</div>
+				<div class="td"><button onclick="ui.vpn_page.show()" data-in-trans="TurnOnVpn">TURN ON VPN</button></div>
+				<div class="td right"><span class="continue" data-in-trans="continue">Continue</span></div>
+			</div>
+		</div>
+		<div id="deviceNotSupported" >
+			<div class="bmsg">
+				<div class="title">We're Sorry</div>
+				<div>
+					<p>&nbsp;</p>
+					<p><b>Popcorn Time Online</b> is currently not supported by your device.</p>
+					<p>Please download Popcorn Time from our homepage and install it on your device.</p>
+				</div>
+
+				<a href="http://" class="myButton">GO TO HOMEPAGE</a>
+			</div>
+		</div>
+		<div id="downloadTorrentsTime">
+			<div class="bmsg">
+				<div class="title">Install Torrents Time</div>
+				<div>
+					<p>&nbsp;</p>
+					<p>In order to use Popcorn Time on your browser.</p>
+					<p>You need to install the <b>Torrents Time</b> browser plugin</p>
+				</div>
+
+				<a href="#" onclick="torrentsTime.downloadInstaller();" class="myButton">DOWNLOAD NOW</a>
+			</div>
+		</div>
+
+		<div class="torrentsTime"></div>
+		<div id="ttbar"><div class="x" onclick="ui.torrentsTime.hide()">Close</div></div>
+    </body>
+</html>
