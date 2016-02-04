@@ -89,8 +89,8 @@
   "Auto clear cache": "Vider automatiquement le cache",
 
 
-  "VpnDisabled":"RPV DÉSACTIVÉ !",
-  "VpnAlert":"Il est fortement recommandé d'utiliser le RPV <br>pour éviter des risques inutiles.",
-  "TurnOnVpn": "Activer RPV",
+  "VpnDisabled":"VPN DÉSACTIVÉ !",
+  "VpnAlert":"Il est fortement recommandé d'utiliser le VPN <br>pour éviter des risques inutiles.",
+  "TurnOnVpn": "Activer VPN",
   "continue":"Continuer"
 }
