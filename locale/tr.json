@@ -1,5 +1,5 @@
 {
-"noTorrents": "Şu an için, aktif bir torrent bulunamadı",
+	"noTorrents": "Şu an için, aktif bir torrent bulunamadı",
 	"torrents": "Torrentler",
 	"episode": "Bölüm",
 	"sortBy": "Sırala",
@@ -59,8 +59,8 @@
 	"western": "Western",
 
 
-  "VpnDisabled":"VPN DISABLED!",
-  "VpnAlert":"IT IS HIGHLY RECOMMENDED TO USE VPN <br>TO AVOID UNNECESSARY RISKS",
-  "TurnOnVpn": "TURN ON VPN",
-  "continue":"Continue"
+  "VpnDisabled":"VPN DEVRE DIŞI!",
+  "VpnAlert":"VPN KULLANMANIZ TAVSİYE EDİLİR",
+  "TurnOnVpn": "VPN AÇ",
+  "continue":"DEVAM ET"
 }
